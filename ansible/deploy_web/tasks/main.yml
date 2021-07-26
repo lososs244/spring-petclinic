@@ -1,0 +1,28 @@
+---
+# tasks file for deploy_web
+  - name: Install required system packages
+    apt: name={{ item }} state=latest update_cache=yes
+    loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+  
+  - name: update apt and install docker.io
+    apt:
+      update_cache: yes
+      name: docker.io
+      state: latest
+        
+  - name: Install Docker Module for Python
+    pip:
+      name: docker  
+
+  - name: Pull default Docker image
+    docker_image:
+      name: 3.68.185.180:5000/spring-petclinic
+      pull: yes
+        
+  - name: Create petclinic container
+    docker_container:
+      name: petclinic
+      image: 3.68.185.180:5000/spring-petclinic
+      state: started
+      ports: 8080:8080
+      recreate: yes
